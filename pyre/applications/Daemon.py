@@ -96,7 +96,10 @@ class Daemon(Stager):
                 journal.error(self.name).log("exception:\n%s" % traceback.format_exc())
         else:
             # debug mode
-            self.main(*self.args, **self.kwds)
+            def main():
+                self.main(*self.args, **self.kwds)
+            from pyre.util import autoreload
+            autoreload.main(main)
 
         return
 

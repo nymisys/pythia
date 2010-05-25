@@ -62,7 +62,7 @@ def reloader_thread():
                 mtimes[filename] = mtime
                 continue
             if mtime != mtimes[filename]:
-                sys.exit(3) # force reload
+                os._exit(3) # force reload
         time.sleep(1)
 
 def restart_with_reloader():
@@ -82,9 +82,9 @@ def main(main_func, args=None, kwargs=None):
             args = ()
         if kwargs is None:
             kwargs = {}
-        thread.start_new_thread(main_func, args, kwargs)
+        thread.start_new_thread(reloader_thread, ())
         try:
-            reloader_thread()
+            main_func(*args, **kwargs)
         except KeyboardInterrupt:
             pass
     else:
