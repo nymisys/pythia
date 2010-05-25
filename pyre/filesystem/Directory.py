@@ -50,6 +50,7 @@ class Directory(File):
 
         files = []
         subdirectories = []
+        self._children = {}
 
         root = self.path
         children = os.listdir(root)
