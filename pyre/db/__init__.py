@@ -18,6 +18,10 @@ def connect(database, wrapper=None):
         from Psycopg import Psycopg
         return Psycopg(database)
 
+    if wrapper == "sqlite3":
+        from SQLite3 import SQLite3
+        return SQLite3(database)
+
     import journal
     journal.error("pyre.db").log("%r: unknown db wrapper type" % wrapper)
     return None

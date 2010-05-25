@@ -43,7 +43,7 @@ class DBManager(object):
 
         # build the sql query
         sql = "INSERT INTO %s (\n    %s\n    ) VALUES (\n    %s\n    )" % (
-            name, ", ".join(columns), ", ".join(["%s"] * len(columns)))
+            name, ", ".join(columns), ", ".join([self.placeholder] * len(columns)))
 
         # execute the sql statement
         c = self.db.cursor()
@@ -62,7 +62,7 @@ class DBManager(object):
             columns.append(column)
             values.append(value)
 
-        expr = ", ".join(["%s=%%s" % column for column in columns])
+        expr = ", ".join(["%s=%s" % (column, self.placeholder) for column in columns])
         sql = "UPDATE %s\n    SET %s\n    WHERE %s" % (table.name, expr, where)
 
         # execute the sql statement
@@ -137,12 +137,14 @@ class DBManager(object):
 
 
     def __init__(self, name):
-        import psycopg
         self.db = self.connect(database=name)
 
         import pyre.parsing.locators
         self.locator = pyre.parsing.locators.simple("%s database" % name)
         return
+
+
+    placeholder = "%s"
 
 
 # version
