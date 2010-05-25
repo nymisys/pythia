@@ -28,7 +28,7 @@ class Marshaller(Component):
 
     def generateClientConfiguration(self, registry):
         raise NotImplementedError(
-            "class %r must override 'generateClientConfiguration'" % self.__class__.__name)
+            "class %r must override 'generateClientConfiguration'" % self.__class__.__name__)
 
     
     def __init__(self, name):

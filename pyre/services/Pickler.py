@@ -48,7 +48,7 @@ class Pickler(Marshaller):
             text = '%s: unable to send request: EOFError' % self.__class__.__name__
             raise self.RequestError(text)
         except IOError, msg:
-            text = '%s: unable to send request: IOError: %s' % (self.__class.__name, msg)
+            text = '%s: unable to send request: IOError: %s' % (self.__class__.__name__, msg)
             raise self.RequestError(text)
 
         return
@@ -63,7 +63,7 @@ class Pickler(Marshaller):
             text = '%s: unable to receive request: EOFError' % self.__class__.__name__
             raise self.RequestError(text)
         except IOError, msg:
-            text = '%s: unable to receive request: IOError: %s' % (self.__class.__name, msg)
+            text = '%s: unable to receive request: IOError: %s' % (self.__class__.__name__, msg)
             raise self.RequestError(text)
 
         self._debug.log("received request: key=%s, data=%s" % (request.key, request.data))
