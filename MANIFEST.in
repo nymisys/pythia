@@ -17,6 +17,8 @@ include journal/colors/dark-bg.odb
 include journal/colors/light-bg.odb
 include journal/colors/none.odb
 include journal/colors/__vault__.odb
+include journal/colors/dark-bg.cfg
+include journal/colors/light-bg.cfg
 include journal/devices/color-console.odb
 include journal/devices/console.odb
 include journal/devices/file.odb
