@@ -98,3 +98,4 @@ include pyre/weaver/__vault__.odb
 include pyre/inventory/odb/prefix.py.in
 include ez_setup/README.txt
 include ez_setup/__init__.py
+include pythia.egg-info/config.cfg
