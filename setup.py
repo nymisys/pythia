@@ -15,14 +15,12 @@ except AssertionError:
 setup(
     
     name = 'pythia', 
-    version = '0.8.1.10',
+    version = '0.8.1.11',
 
     scripts = ['bin/idd.py', 'bin/ipad.py', 'bin/journald.py'],
 
     zip_safe = False,
     packages = find_packages(),
-    # include everything under version control
-    include_package_data = True,
 
     entry_points = {
     },
