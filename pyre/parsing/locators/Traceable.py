@@ -32,7 +32,8 @@ class Traceable(object):
         return self.locator
 
 
-    def __init__(self):
+    def __init__(self, *args, **kwds):
+        super(Traceable, self).__init__(*args, **kwds)
         self.locator = None
         return
 

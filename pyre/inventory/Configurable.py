@@ -334,8 +334,8 @@ class Configurable(Traceable):
         return MetaInventory(self.inventory)
 
 
-    def __init__(self, name=None):
-        Traceable.__init__(self)
+    def __init__(self, name=None, *args, **kwds):
+        super(Configurable, self).__init__(*args, **kwds)
 
         if name is None:
             name = self.name # class attribute

@@ -47,8 +47,9 @@ class Component(Configurable):
         return Configurable.updateConfiguration(self, registry)
 
 
-    def __init__(self, name=None, facility=None):
-        Configurable.__init__(self, name)
+    def __init__(self, name=None, facility=None, *args, **kwds):
+        super(Component, self).__init__(name, *args, **kwds)
+        
         #self.facility = facility # not used
 
         self._helpRequested = False
@@ -57,7 +58,7 @@ class Component(Configurable):
 
 
     def _configure(self):
-        Configurable._configure(self)
+        super(Component, self)._configure()
         if (self.inventory.usage or
             self.inventory.showProperties or
             self.inventory.showComponents or

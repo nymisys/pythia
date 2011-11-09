@@ -110,10 +110,9 @@ class Application(Component, Executive):
         return ':'.join(self.path())
 
 
-    def __init__(self, name=None, facility=None):
-        Component.__init__(self, name, facility)
-        Executive.__init__(self)
-    
+    def __init__(self, *args, **kwds):
+        super(Application, self).__init__(*args, **kwds)
+
         # my name as seen by the shell
         import sys
         self.filename = sys.argv[0]
@@ -132,7 +131,7 @@ class Application(Component, Executive):
 
 
     def _init(self):
-        Component._init(self)
+        super(Application, self)._init()
         self.weaver = self.inventory.weaver
 
         renderer = self.getCurator().codecs['pml'].renderer

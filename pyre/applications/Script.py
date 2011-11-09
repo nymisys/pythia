@@ -17,12 +17,8 @@ from Stager import Stager
 
 
 class Script(Application, Stager):
+    pass
 
-
-    def __init__(self, name=None):
-        Application.__init__(self, name)
-        Stager.__init__(self)
-        return
 
 
 # version

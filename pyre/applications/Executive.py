@@ -186,9 +186,11 @@ class Executive(object):
         return
 
 
-    def __init__(self):
+    def __init__(self, *args, **kwds):
+        super(Executive, self).__init__(*args, **kwds)
         self.arg0 = self.name
         self._requires = None
+        return
 
 
 # version

@@ -81,8 +81,8 @@ class Preprocessor(Component):
         return
 
 
-    def __init__(self, name):
-        Component.__init__(self, "macros", name)
+    def __init__(self, *args, **kwds):
+        super(Preprocessor, self).__init__(*args, **kwds)
         self.macros = Registry(self.name)
         self.rp = None
         return
