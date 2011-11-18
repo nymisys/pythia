@@ -83,12 +83,13 @@ def main(main_func, args=None, kwargs=None):
         if kwargs is None:
             kwargs = {}
         thread.start_new_thread(reloader_thread, ())
-        try:
-            main_func(*args, **kwargs)
-        except KeyboardInterrupt:
-            pass
+        main_func(*args, **kwargs)
     else:
         try:
             sys.exit(restart_with_reloader())
         except KeyboardInterrupt:
-            pass
+            # We catch SIGINT here because:
+            #   * There is no need to see parent traceback.
+            #   * The waitpid() was interrupted, so we must wait for
+            #     the child to print its traceback and exit.
+            os.wait()
