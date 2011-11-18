@@ -81,10 +81,23 @@ class Daemon(Stager):
         # self.configureJournal()
 
         if spawn:
-            # close all ties with the parent process
-            os.close(2)
-            os.close(1)
-            os.close(0)
+            # Close all ties with the parent process.  Simply closing
+            # the std* descriptors (0,1,2) allows them to be reused,
+            # which leads to stray stdout/stderr writes corrupting
+            # random sockets, etc.  So instead, replace them with
+            # handles to /dev/null.
+            
+            from pyre.util import devnull
+            
+            fd = os.open(devnull(), os.O_RDONLY)
+            os.dup2(fd, 0)
+            os.close(fd)
+            fd = os.open(devnull(), os.O_WRONLY)
+            os.dup2(fd, 1)
+            os.close(fd)
+            fd = os.open(devnull(), os.O_WRONLY)
+            os.dup2(fd, 2)
+            os.close(fd)
         
             # launch the application
             try:
