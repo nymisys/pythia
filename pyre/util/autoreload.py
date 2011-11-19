@@ -28,27 +28,18 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import os, sys, time
 
-try:
-    import thread
-except ImportError:
-    import dummy_thread as thread
+class Autoreload(object):
 
-# This import does nothing, but it's necessary to avoid some race conditions
-# in the threading module. See http://code.djangoproject.com/ticket/2330 .
-try:
-    import threading
-except ImportError:
-    pass
+    def __init__(self):
+        self.mtimes = {}
 
+    def scan(self):
+        import os, sys
 
-RUN_RELOADER = True
+        mtimes = self.mtimes
+        win = (sys.platform == "win32")
 
-def reloader_thread():
-    mtimes = {}
-    win = (sys.platform == "win32")
-    while RUN_RELOADER:
         for filename in filter(lambda v: v, map(lambda m: getattr(m, "__file__", None), sys.modules.values())):
             if filename.endswith(".pyc") or filename.endswith("*.pyo"):
                 filename = filename[:-1]
@@ -62,34 +53,6 @@ def reloader_thread():
                 mtimes[filename] = mtime
                 continue
             if mtime != mtimes[filename]:
-                os._exit(3) # force reload
-        time.sleep(1)
+                return True
 
-def restart_with_reloader():
-    while True:
-        args = [sys.executable] + sys.argv
-        if sys.platform == "win32":
-            args = ['"%s"' % arg for arg in args]
-        new_environ = os.environ.copy()
-        new_environ["RUN_MAIN"] = 'true'
-        exit_code = os.spawnve(os.P_WAIT, sys.executable, args, new_environ)
-        if exit_code != 3:
-            return exit_code
-
-def main(main_func, args=None, kwargs=None):
-    if os.environ.get("RUN_MAIN") == "true":
-        if args is None:
-            args = ()
-        if kwargs is None:
-            kwargs = {}
-        thread.start_new_thread(reloader_thread, ())
-        main_func(*args, **kwargs)
-    else:
-        try:
-            sys.exit(restart_with_reloader())
-        except KeyboardInterrupt:
-            # We catch SIGINT here because:
-            #   * There is no need to see parent traceback.
-            #   * The waitpid() was interrupted, so we must wait for
-            #     the child to print its traceback and exit.
-            os.wait()
+        return False
