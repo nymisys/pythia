@@ -11,11 +11,29 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 
-import os
-from os.path import dirname
-from pyre import __version__
+import os.path
 
-_SYSTEM_ROOT = '/etc/pythia-' + __version__ # PORTABILITY: unix only
+
+def systemDepositoryRoot():
+    from os.path import dirname, join, isdir, abspath
+    import pyre
+
+    pythia = "pythia-" + pyre.__version__
+    
+    d = join(dirname(dirname(pyre.__file__)), "etc", pythia)
+    if isdir(d):
+        # running from egg
+        return abspath(d)
+    d = dirname(d)
+    if isdir(d):
+        # running from source directory
+        return abspath(d)
+    # installation dir
+    d = join(dirname(dirname(dirname(dirname(d)))), "etc", pythia)
+    return abspath(d)
+
+
+_SYSTEM_ROOT = systemDepositoryRoot()
 _USER_ROOT = os.path.join(os.path.expanduser('~'), '.pyre')
 _LOCAL_ROOT = [ '.' ]
 

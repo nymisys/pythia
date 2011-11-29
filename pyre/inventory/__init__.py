@@ -45,11 +45,6 @@ def codecConfig():
     return CodecConfig()
 
 
-def codecConfigSheet():
-    from pcs.CodecConfigSheet import CodecConfigSheet
-    return CodecConfigSheet()
-
-
 def renderer(mode="pml"):
     if mode == "pml":
         from pml.Renderer import Renderer

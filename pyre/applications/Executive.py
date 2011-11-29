@@ -172,17 +172,7 @@ class Executive(object):
 
 
     def version(self):
-        from pkg_resources import get_provider, Requirement
-        try:
-            req = self.requires()
-        except ImportError:
-            print "Please consider writing version info for this application."
-            return
-        req = Requirement.parse(req)
-        provider = get_provider(req)
-        # NYI: make this pretty
-        for line in provider.get_metadata_lines("PKG-INFO"):
-            print line
+        print "Please consider writing version info for this application."
         return
 
 

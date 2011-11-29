@@ -38,12 +38,7 @@ class Directory(File):
 
         import os
         import stat
-        from BlockDevice import BlockDevice
-        from CharacterDevice import CharacterDevice
         from File import File
-        from Link import Link
-        from NamedPipe import NamedPipe
-        from Socket import Socket
 
         import journal
         debug = journal.debug("pyre.filesystem")
@@ -64,27 +59,13 @@ class Directory(File):
                 continue
             
             pathname = os.path.join(root, name)
-            # PORTABILITY: lstat is unix only
-            mode = os.lstat(pathname)[stat.ST_MODE]
 
-            if stat.S_ISDIR(mode):
+            if os.path.isdir(pathname):
                 node = Directory(name, self)
                 subdirectories.append(node)
-            elif stat.S_ISREG(mode):
+            elif os.path.isfile(pathname):
                 node = File(name, self)
                 files.append(node)
-            elif stat.S_ISLNK(mode):
-                node = Link(name, self)
-            elif stat.S_ISSOCK(mode):
-                node = Socket(name, self)
-            elif stat.S_ISFIFO(mode):
-                node = NamedPipe(name, self)
-            elif stat.S_ISCHR(mode):
-                node = CharacterDevice(name, self)
-            elif stat.S_ISBLK(mode):
-                node = BlockDevice(name, self)
-            else:
-                Firewall.hit("unknown file type: mode=%x" % mode)
 
             self._children[node.name] = node
 

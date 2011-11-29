@@ -12,14 +12,33 @@
 
 
 from pyre.inventory.Configurable import Configurable
+from pyre.components.Component import Component
 
 
-try:
-    # XXX: This default is annoying when one is debugging CGI apps.
-    import IPython.ultraTB
-    defaultExceptHook = "ultraTB"
-except ImportError:
-    defaultExceptHook = "current"
+
+class ShellComponent(Component):
+
+    name = "shell"
+
+    import pyre.hooks
+    excepthook = pyre.hooks.facility("excepthook", family="excepthook")
+
+    def _init(self):
+        super(ShellComponent, self)._init()
+        
+        if self.excepthook:
+            import sys
+            sys.excepthook = self.excepthook.excepthook
+
+        return
+
+
+
+def shellFacility(**kwds):
+    from pyre.inventory.Facility import Facility
+    kwds['factory'] = kwds.get('factory', ShellComponent)
+    return Facility("shell", **kwds)
+
 
 
 class Shell(Configurable):
@@ -27,10 +46,8 @@ class Shell(Configurable):
 
     import pyre.inventory
     version = pyre.inventory.bool("version")
-    
-    import pyre.hooks
-    excepthook = pyre.hooks.facility("excepthook", family="excepthook",
-                                     default=defaultExceptHook)
+
+    shell = shellFacility()
 
     import journal
     journal = journal.facility()
@@ -103,10 +120,6 @@ class Shell(Configurable):
 
         # initialize the trait cascade
         self.init()
-
-        import sys
-        if self.excepthook:
-            sys.excepthook = self.excepthook.excepthook
 
         # ~~ configure the application ~~~
         

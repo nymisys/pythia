@@ -24,6 +24,11 @@ class ColorRenderer(Renderer):
         colorScheme = journal.colors.colorScheme("color-scheme", default="dark-bg")
 
 
+    def __init__(self, name="color-renderer"):
+        Renderer.__init__(self, name)
+        return
+
+
     def _init(self):
         renderer = Renderer._init(self)
         renderer.colorScheme = self.inventory.colorScheme

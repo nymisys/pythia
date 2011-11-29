@@ -18,7 +18,7 @@ from pyre.odb.fs.Curator import Curator as Base
 class Curator(Base):
 
 
-    def getTraits(self, name, context=None, encodings=['pml','cfg','pcs'], vault=[], extraDepositories=[]):
+    def getTraits(self, name, context=None, encodings=['pml','cfg'], vault=[], extraDepositories=[]):
         """load cascade of inventory values for component <name>"""
 
         # initialize the registry object
@@ -196,17 +196,6 @@ class Curator(Base):
         userDepository = self.setUserDepository(user)
         systemDepository = self.setSystemDepository(system)
 
-        # create the built-in depositories
-        from pkg_resources import resource_listdir, resource_isdir, resource_exists, resource_filename, Requirement
-        pythia = Requirement.parse("pythia")
-        entries = resource_listdir(pythia, "")
-        for entry in entries:
-            if resource_isdir(pythia, entry):
-                vault = entry + '/__vault__.odb'
-                if resource_exists(pythia, vault):
-                    builtin = self.createDepository(resource_filename(pythia, entry))
-                    self.builtinDepositories.append(builtin)
-
         return
 
 
@@ -309,15 +298,11 @@ class Curator(Base):
         import pyre.inventory
         pml = pyre.inventory.codecPML()
         cfg = pyre.inventory.codecConfig()
-        pcs = pyre.inventory.codecConfigSheet()
 
         import pyre.odb
         odb = pyre.odb.odb()
 
-        import pyre.templates
-        tmpl = pyre.templates.codecTmpl()
-
-        self.registerCodecs(pml, cfg, pcs, odb, tmpl)
+        self.registerCodecs(pml, cfg, odb)
 
         return
 
