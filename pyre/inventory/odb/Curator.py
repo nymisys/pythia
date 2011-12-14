@@ -161,40 +161,86 @@ class Curator(Base):
         return None
 
 
+    def systemDepositoryPath(self):
+        import os, sys, pyre
+        from os.path import isdir, join
+
+        pythia = "pythia-" + pyre.__version__
+
+        system = []
+        cache = set()
+
+        for item in sys.path:
+            # source or egg directory
+            candidate = join(item, "etc", pythia)
+            if isdir(candidate):
+                system.append(candidate)
+                continue
+
+            # {prefix}/etc
+            path = item.split(os.sep)
+            if not "lib" in path:
+                continue
+            etc = os.sep.join(path[:path.index("lib")] + ["etc"])
+            candidate = join(etc, pythia)
+            if not candidate in cache:
+                if isdir(candidate):
+                    system.append(candidate)
+                cache.add(candidate)
+
+        # /etc
+        candidate = join("/etc", pythia)
+        if not candidate in cache and isdir(candidate):
+            system.append(candidate)
+
+        return system
+        
+
+    def userDepositoryPath(self):
+        from os.path import join, expanduser
+        return [join(expanduser('~'), '.pyre')]
+
+
+    def localDepositoryPath(self):
+        return [ '.' ]
+
+
     def config(self, registry):
         # gain access to the installation defaults
-        import prefix
-        user = prefix._USER_ROOT
-        system = prefix._SYSTEM_ROOT
-        local = prefix._LOCAL_ROOT
+        user = self.userDepositoryPath()
+        system = self.systemDepositoryPath()
+        local = self.localDepositoryPath()
 
         # gain access to the user settings from the command line
         db = registry.extractNode(self._DB_NAME)
+
+        def parseSpec(spec):
+            if spec[0] == '[':
+                spec = spec[1:]
+            if spec[-1] == ']':
+                spec = spec[:-1]
+            return spec.split(',')
 
         # take care of the "local" directories
         if db:
             spec = db.getProperty('user', None)
             if spec is not None:
-                user = spec
+                user = parseSpec(spec)
 
             spec = db.getProperty('system', None)
             if spec is not None:
-                system = spec
-                
+                system = parseSpec(spec)
+
             spec = db.getProperty('local', None)
             if spec is not None:
-                if spec[0] == '[':
-                    spec = spec[1:]
-                if spec[-1] == ']':
-                    spec = spec[:-1]
-                local = spec.split(',')
+                local = parseSpec(spec)
 
         # add the local depositories to the list
         self.addDepositories(*local)
 
         # create the root depositories for the system and user areas
-        userDepository = self.setUserDepository(user)
-        systemDepository = self.setSystemDepository(system)
+        self.setUserDepositories(user)
+        self.setSystemDepositories(system)
 
         return
 
@@ -206,16 +252,14 @@ class Curator(Base):
         depositories = []
 
         # construct the depositories
-        # first the user specific one
-        userRoot = self.userDepository
-        if userRoot:
+        # first the user specific ones
+        for userRoot in self.userDepositories:
             user = userRoot.createDepository(name)
             if user:
                 depositories.append(user)
 
-        # next the system wide one
-        systemRoot = self.systemDepository
-        if systemRoot:
+        # next the system wide ones
+        for systemRoot in self.systemDepositories:
             system = systemRoot.createDepository(name)
             if system:
                 depositories.append(system)
@@ -223,14 +267,22 @@ class Curator(Base):
         return depositories
 
 
-    def setUserDepository(self, directory):
-        self.userDepository = self.createDepository(directory)
-        return self.userDepository
+    def setUserDepositories(self, directories):
+        self.userDepositories = []
+        for directory in directories:
+            depository = self.createDepository(directory)
+            if depository:
+                self.userDepositories.append(depository)
+        return
 
 
-    def setSystemDepository(self, directory):
-        self.systemDepository = self.createDepository(directory)
-        return self.systemDepository
+    def setSystemDepositories(self, directories):
+        self.systemDepositories = []
+        for directory in directories:
+            depository = self.createDepository(directory)
+            if depository:
+                self.systemDepositories.append(depository)
+        return
 
 
     def dump(self, extras=None):
@@ -264,19 +316,12 @@ class Curator(Base):
         return
 
 
-    def searchOrder(self, extraDepositories=[]):
-        return Base.searchOrder(self, extraDepositories) + self.builtinDepositories
-
-
     def __init__(self, name):
         Base.__init__(self, name)
 
         # the top level system and user depositories
-        self.userDepository = None
-        self.systemDepository = None
-
-        # the built-in depositories
-        self.builtinDepositories = []
+        self.userDepositories = []
+        self.systemDepositories = []
 
         # install the peristent store recognizers
         self._registerCodecs()
