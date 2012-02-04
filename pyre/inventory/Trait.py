@@ -97,6 +97,10 @@ class Trait(object):
         return
 
 
+    def _convertValueToRegistryValue(self, value):
+        return value
+
+
 # version
 __id__ = "$Id: Trait.py,v 1.6 2005/03/17 04:00:23 aivazis Exp $"
 

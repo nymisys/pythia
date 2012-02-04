@@ -35,6 +35,12 @@ class Component(Configurable):
         showCurator.meta['tip'] = 'prints a screen that describes my persistent store'
 
 
+    def metaTraits(self):
+        # Filter-out help stuff.  XXX: Perhaps there is a cleaner way
+        # to separate out meta-traits?
+        return Component.Inventory._traitRegistry.keys()
+
+
     def updateConfiguration(self, registry):
         # verify that we were handed the correct registry node
         if registry:

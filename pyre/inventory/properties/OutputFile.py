@@ -38,6 +38,15 @@ class OutputFile(Property):
         return value
 
 
+    def _convertValueToRegistryValue(self, value):
+        import sys
+        if value is sys.stdout:
+            return "stdout"
+        if value is sys.stderr:
+            return "stderr"
+        return value.name
+
+
 # version
 __id__ = "$Id: OutputFile.py,v 1.2 2005/03/11 06:09:39 aivazis Exp $"
 

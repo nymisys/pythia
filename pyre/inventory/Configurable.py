@@ -41,13 +41,21 @@ class Configurable(Traceable):
 
 
     # configuration management
-    def retrieveConfiguration(self, registry=None):
+    def retrieveConfiguration(self, registry=None, facilityName=None):
         """place my current configuration in the given registry"""
 
         if registry is None:
             registry = self.createRegistry()
 
-        return self.inventory.retrieveConfiguration(registry)
+        return self.inventory.retrieveConfiguration(
+            registry,
+            facilityName = facilityName,
+            excludedTraits = self.metaTraits()
+            )
+
+
+    def metaTraits(self):
+        return []
 
 
     def initializeConfiguration(self, context):
@@ -341,6 +349,12 @@ class Configurable(Traceable):
             name = self.name # class attribute
         else:
             self.name = name
+
+        # default facility value used by retrieveConfiguration()
+        # see also Facility._retrieveComponent()
+        self.factory = "%s:%s." % (
+            self.__module__, self.__class__.__name__)
+
         self.inventory = self.createInventory()
         
         # provide simple, convenient access to descriptors

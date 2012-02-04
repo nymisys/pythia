@@ -32,7 +32,17 @@ class Parser(Singleton):
 
 
     def parse(self, string):
-        return eval(string, self.context)
+        from pyre.units.unit import one, unit
+
+        value = eval(string, self.context)
+
+        if (not isinstance(value, unit) and
+            (type(value) in (type(0), type(0.0)))
+            ):
+            # convert to dimensionless value
+            value = one * value
+
+        return value
     
 
     def init(self, *args, **kwds):

@@ -111,28 +111,34 @@ class Inventory(object):
         return
 
 
-    def retrieveConfiguration(self, registry):
+    def retrieveConfiguration(self, registry, facilityName=None, excludedTraits=None):
         """place the current inventory configuration in the given registry"""
 
         from Facility import Facility
         from Property import Property
 
-        node = registry.getNode(self._priv_name)
+        node = registry.getNode(facilityName or self._priv_name)
+        excludedTraits = excludedTraits or []
 
         for prop in self._traitRegistry.itervalues():
 
             name = prop.name
+
+            if name in excludedTraits:
+                continue
+
             descriptor = self.getTraitDescriptor(name)
             value = descriptor.value
             locator = descriptor.locator
 
-            if value and isinstance(prop, Facility):
-                value = value.name
+            value = prop._convertValueToRegistryValue(value)
 
             node.setProperty(name, value, locator)
 
-        for component in self.components():
-            component.retrieveConfiguration(node)
+        for name, component in self.componentDictionary().iteritems():
+            if name in excludedTraits:
+                continue
+            component.retrieveConfiguration(node, facilityName=name)
             
         return registry
 
@@ -147,9 +153,7 @@ class Inventory(object):
         for prop in self._traitRegistry.itervalues():
             name = prop.name
             value, locator = prop._getDefaultValue(self)
-            if isinstance(prop, Facility):
-                # This isn't necessarily true.
-                value = value.name
+            value = prop._convertValueToRegistryValue(value)
             node.setProperty(name, value, locator)
 
         for facility in self._facilityRegistry.itervalues():
@@ -391,15 +395,22 @@ class Inventory(object):
     def components(self, context=None):
         """return a list of my components"""
 
+        candidates = self.componentDictionary(context)
+        return candidates.values()
+
+
+    def componentDictionary(self, context=None):
+        """return a dictionary mapping facility names to my components"""
+
         from pyre.inventory import Error
 
-        candidates = []
+        candidates = {}
 
         for name, facility in self._facilityRegistry.iteritems():
             try:
                 component = facility.__get__(self)
                 if component and component is not Error:
-                    candidates.append(component)
+                    candidates[name] = component
             except SystemExit:
                 raise
             except Exception, error:

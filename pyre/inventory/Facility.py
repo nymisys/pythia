@@ -135,7 +135,10 @@ class Facility(Trait):
 
         # adjust the names by which this component is known
         component.aliases.append(self.name)
-            
+
+        # adjust the facility value used by retrieveConfiguration()
+        component.factory = componentName
+
         return component, locator
 
 
@@ -209,6 +212,10 @@ class Facility(Trait):
         item = factory(*self.args)
 
         return item
+
+
+    def _convertValueToRegistryValue(self, value):
+        return value.factory
 
 
     vault = []
