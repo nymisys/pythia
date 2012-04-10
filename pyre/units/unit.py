@@ -117,7 +117,11 @@ class unit(object):
 
     def __cmp__(self, other):
         return cmp(self.value, other.value)
-            
+
+
+    def __hash__(self):
+        return hash(self.value)
+
 
     def __str__(self):
         str = "%g" % self.value 
