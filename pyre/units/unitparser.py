@@ -51,11 +51,15 @@ class Parser(Singleton):
 
 
     def _initializeContext(self):
+        from pyre.units.unit import one
+
         context = {}
 
         modules = self._loadModules()
         for module in  modules:
             context.update(module.__dict__)
+
+        context['one'] = one
 
         return context
 

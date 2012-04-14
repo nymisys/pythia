@@ -136,7 +136,7 @@ class unit(object):
         str = "%g" % self.value 
         derivation = self._strDerivation()
         if not derivation:
-            return str
+            derivation = "one"
 
         return str + "*" + derivation
 
