@@ -38,6 +38,7 @@ setup(
         'pyre.inventory.validators',
         #'pyre.ipa',
         #'pyre.ipc',
+        'pyre.net', # Embers addition
         'pyre.odb',
         'pyre.odb.common',
         'pyre.odb.dbm',

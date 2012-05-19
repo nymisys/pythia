@@ -118,6 +118,11 @@ def slice(name, **kwds):
     return Slice(name, **kwds)
 
 
+def sockaddr(name, **kwds):
+    from properties.SocketAddress import SocketAddress
+    return SocketAddress(name, **kwds)
+
+
 def str(name, **kwds):
     from properties.String import String
     return String(name, **kwds)
