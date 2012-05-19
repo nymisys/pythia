@@ -9,9 +9,10 @@
 
 class RTT(object):
 
-    RXTMIN = 2 # min retransmit timeout value, in seconds
-    RXTMAX = 60 # max retransmit timeout value, in seconds
+    RXTMIN = 0.1 # min retransmit timeout value, in seconds
+    RXTMAX = 60.0 # max retransmit timeout value, in seconds
     MAXNREXMT = 3 # max number of times to retransmit
+    RXT_MIN_THRESHOLD = 2.0 # so we don't give up too quickly
 
     @classmethod
     def minmax(cls, rto):
@@ -51,7 +52,8 @@ class RTT(object):
 
     def timeout(self, message):
         self.rto = self.minmax(self.rto * 2.0) # XXX minmax() not in book
-        message.nrexmt += 1
+        if self.rto >= self.RXT_MIN_THRESHOLD:
+            message.nrexmt += 1
         if message.nrexmt > self.MAXNREXMT:
             return -1 # give up
         return 0
