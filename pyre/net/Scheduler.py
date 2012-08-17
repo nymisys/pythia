@@ -67,23 +67,7 @@ class Scheduler(object):
 
     def updateInternalClock(self):
         """Advance our internal clock to the current system time."""
-        now = self.getCurrentTime()
-        if now < self.now:
-            self.clockSetBack(self.now - now)
-        self.now = now
-        return
-
-
-    def clockSetBack(self, delta):
-        """The system clock was set back; update our internal data
-        structures."""
-        if not self.alarms:
-            return # nothing to do
-        self.alarmIndex = []
-        for alarm in self.alarms:
-            alarm.time -= delta
-            self.alarmIndex.append(alarm.time)
-        self.alarmIndex.sort(reverse = True)
+        self.now = self.getCurrentTime()
         return
 
 
