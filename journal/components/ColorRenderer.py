@@ -21,7 +21,7 @@ class ColorRenderer(Renderer):
 
         import journal.colors
 
-        colorScheme = journal.colors.colorScheme("color-scheme", default="dark-bg")
+        colorScheme = journal.colors.colorScheme("color-scheme", default="none")
 
 
     def __init__(self, name="color-renderer"):
