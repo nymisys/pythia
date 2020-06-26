@@ -42,6 +42,19 @@ class TestInventory(unittest.TestCase):
         self.assertEqual(SimpleFacility.DEFAULT_FLOAT, sdata["float"])
         self.assertEqual(SimpleFacility.DEFAULT_STRING, sdata["string"])
 
+        adata = app.data["array"]
+        self.assertEqual(2, len(adata))
+
+        sdata = adata[0]
+        self.assertEqual(SimpleFacility.DEFAULT_INT, sdata["int"])
+        self.assertEqual(SimpleFacility.DEFAULT_FLOAT, sdata["float"])
+        self.assertEqual(SimpleFacility.DEFAULT_STRING, sdata["string"])
+
+        sdata = adata[1]
+        self.assertEqual(SimpleFacility.DEFAULT_INT, sdata["int"])
+        self.assertEqual(SimpleFacility.DEFAULT_FLOAT, sdata["float"])
+        self.assertEqual(SimpleFacility.DEFAULT_STRING, sdata["string"])
+
     def test_commandline(self):
         app = PyreApp()
         args = [
@@ -51,8 +64,12 @@ class TestInventory(unittest.TestCase):
             "--list_string=[iii, jjj, kkk]",
             "--array_int=[6, 5, 4]",
             "--input_file=tests/pyre/data.in",
-            "--output_file=data.out",
+            "--output_file=tests/pyre/data.out",
             "--simple_facility=simpletoo-facility",
+            "--facility_array.one.simple_int=34",
+            "--facility_array.one.simple_string=one-one",
+            "--facility_array.two.simple_int=56",
+            "--facility_array.two.simple_string=two-two",
         ]
         app.run(argv=["pyreapp"] + args)
 
@@ -72,6 +89,19 @@ class TestInventory(unittest.TestCase):
         self.assertEqual(SimpleTooFacility.DEFAULT_INT, sdata["int"])
         self.assertEqual(SimpleTooFacility.DEFAULT_FLOAT, sdata["float"])
         self.assertEqual(SimpleTooFacility.DEFAULT_STRING, sdata["string"])
+
+        adata = app.data["array"]
+        self.assertEqual(2, len(adata))
+
+        sdata = adata[0]
+        self.assertEqual(34, sdata["int"])
+        self.assertEqual(SimpleFacility.DEFAULT_FLOAT, sdata["float"])
+        self.assertEqual("one-one", sdata["string"])
+
+        sdata = adata[1]
+        self.assertEqual(56, sdata["int"])
+        self.assertEqual(SimpleFacility.DEFAULT_FLOAT, sdata["float"])
+        self.assertEqual("two-two", sdata["string"])
 
     def test_cfg(self):
         from pyre.units.mass import g
@@ -96,6 +126,28 @@ class TestInventory(unittest.TestCase):
         self.assertEqual(-0.1, sdata["float"])
         self.assertEqual("Hello", sdata["string"])
 
+        adata = app.data["array"]
+        self.assertEqual(3, len(adata))
+
+        sdata = adata[0]
+        self.assertEqual(4, sdata["int"])
+        self.assertEqual(4.4, sdata["float"])
+        self.assertEqual("fore", sdata["string"])
+
+        cdata = adata[1]
+        self.assertEqual(5, cdata["int"])
+        self.assertEqual(5.5, cdata["float"])
+        self.assertEqual("jive", cdata["string"])
+        sdata = cdata["facility"]
+        self.assertEqual(55, sdata["int"])
+        self.assertEqual(55.5, sdata["float"])
+        self.assertEqual("jive five", sdata["string"])
+
+        sdata = adata[2]
+        self.assertEqual(6, sdata["int"])
+        self.assertEqual(6.6, sdata["float"])
+        self.assertEqual("sixty", sdata["string"])
+        
     def test_pml(self):
         from pyre.units.mass import kg
 
@@ -181,7 +233,7 @@ class ComplexFacility(Component):
             "int": self.valueInt,
             "float": self.valueFloat,
             "string": self.valueString,
-            "facility": self.nestedFacility,
+            "facility": self.nestedFacility.getData(),
             }
 
 class ArrayTwo(Component):
@@ -192,6 +244,8 @@ class ArrayTwo(Component):
     def __init__(self, name="arraytwo"):
         Component.__init__(self, name, facility="simple")
 
+    def components(self):
+        return [self.one, self.two]
     
 def simpleFactory(name):
     return pyre.inventory.facility(name, family="simple", factory=SimpleFacility)
