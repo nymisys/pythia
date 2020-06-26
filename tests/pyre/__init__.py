@@ -13,11 +13,13 @@
 #
 
 import test_units
+import test_inventory
 
 def test_cases():
     tests = [
         test_units.TestUnit,
         test_units.TestUnits,
+        test_inventory.TestInventory,
         ]
     return tests
 

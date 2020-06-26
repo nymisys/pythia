@@ -21,6 +21,7 @@ Run `coverage html -d DIR` to generate an HTML report in directory `DIR`.
 """
 
 import unittest
+import sys
 
 
 class TestApp(object):
@@ -29,7 +30,16 @@ class TestApp(object):
     cov = None
     try:
         import coverage
-        cov = coverage.Coverage(source=["pyre.units", "journal"])
+        src_dirs = [
+            "pyre.units",
+            "pyre.inventory",
+            "pyre.applications",
+            "pyre.components",
+            "pyre.odb",
+            "pyre.parsing",
+            "journal",
+            ]
+        cov = coverage.Coverage(source=src_dirs)
     except ImportError:
         pass
 
@@ -40,10 +50,11 @@ class TestApp(object):
         if self.cov:
             self.cov.start()
 
+        sys.path.append("tests/pyre")
+            
         success = unittest.TextTestRunner(verbosity=2).run(self._suite()).wasSuccessful()
 
         if not success:
-            import sys
             sys.exit(1)
 
         if self.cov:
